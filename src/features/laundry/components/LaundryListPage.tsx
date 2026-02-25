@@ -5,10 +5,12 @@ import {
     Table, TableBody, TableCell, TableHead, TableHeader, TableRow
 } from "@/components/ui/table";
 import type { LaundryOrder } from "@/shared/types";
-import { useDelete, useInvalidate, useTable } from "@refinedev/core";
+import { useDelete, useInvalidate } from "@refinedev/core";
+import { useQuery } from "convex/react";
 import { Eye, LayoutGrid, List, Pencil, Plus, Trash2, WifiOff } from "lucide-react";
 import React, { useState } from "react";
 import { toast } from "sonner";
+import { api } from "../../../../convex/_generated/api";
 import { CreateOrderModal } from "./CreateOrderModal";
 import { EditOrderModal } from "./EditOrderModal";
 
@@ -62,12 +64,13 @@ const ViewToggle: React.FC<{ view: View; onChange: (v: View) => void }> = ({ vie
 
 // ─── Page ─────────────────────────────────────────────────────
 export const LaundryListPage: React.FC = () => {
-  const { tableQueryResult } = useTable({ resource: "laundryOrders" });
+  // Use Convex query for real-time updates
+  const ordersQuery = useQuery(api.laundry.getUserOrders);
   const { mutate: deleteOne } = useDelete();
   const invalidate = useInvalidate();
 
-  const orders = (tableQueryResult?.data?.data ?? []) as LaundryOrder[];
-  const isLoading = !tableQueryResult.data;
+  const orders = (ordersQuery ?? []) as LaundryOrder[];
+  const isLoading = ordersQuery === undefined;
 
   const [showCreate, setShowCreate] = useState(false);
   const [editingOrder, setEditingOrder] = useState<LaundryOrder | null>(null);
@@ -91,6 +94,7 @@ export const LaundryListPage: React.FC = () => {
           } else {
             toast.success("Order deleted.");
           }
+          // Invalidate list just in case, though useQuery handles it automatically
           invalidate({ resource: "laundryOrders", invalidates: ["list"] });
         },
         onError: (err) => toast.error(`Delete failed: ${err.message}`),

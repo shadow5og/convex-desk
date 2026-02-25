@@ -4,13 +4,15 @@ import {
     Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import type { CleaningBooking } from "@/shared/types";
-import { useDelete, useInvalidate, useTable } from "@refinedev/core";
+import { useDelete, useInvalidate } from "@refinedev/core";
+import { useQuery } from "convex/react";
 import {
     Calendar, Clock, LayoutGrid, List, MapPin,
     Pencil, Plus, Trash2, WifiOff,
 } from "lucide-react";
 import React, { useState } from "react";
 import { toast } from "sonner";
+import { api } from "../../../../convex/_generated/api";
 import { CreateBookingModal } from "./CreateBookingModal";
 import { EditBookingModal } from "./EditBookingModal";
 
@@ -70,12 +72,12 @@ const ViewToggle: React.FC<{ view: View; onChange: (v: View) => void }> = ({ vie
 
 // ─── Page ────────────────────────────────────────────────────
 export const CleaningPage: React.FC = () => {
-  const { tableQueryResult } = useTable({ resource: "cleaningBookings" });
+  const bookingsQuery = useQuery(api.cleaning.getUserBookings);
   const { mutate: deleteOne } = useDelete();
   const invalidate = useInvalidate();
 
-  const bookings = (tableQueryResult?.data?.data ?? []) as CleaningBooking[];
-  const isLoading = !tableQueryResult.data;
+  const bookings = (bookingsQuery ?? []) as CleaningBooking[];
+  const isLoading = bookingsQuery === undefined;
 
   const [showCreate, setShowCreate] = useState(false);
   const [editingBooking, setEditingBooking] = useState<CleaningBooking | null>(null);
