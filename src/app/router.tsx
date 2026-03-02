@@ -1,6 +1,6 @@
 import { Authenticated as RefineAuthenticated } from "@refinedev/core";
 import { CatchAllNavigate, UnsavedChangesNotifier } from "@refinedev/react-router-v6";
-import { Authenticated as ConvexAuthenticated, Unauthenticated as ConvexUnauthenticated } from "convex/react";
+import { Authenticated as ConvexAuthenticated, Unauthenticated as ConvexUnauthenticated, AuthLoading } from "convex/react";
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 
@@ -9,9 +9,15 @@ import { CleaningPage } from "@/features/cleaning";
 import { DashboardPage } from "@/features/dashboard";
 import { LaundryListPage } from "@/features/laundry";
 import { AppLayout } from "@/shared/components/layout";
+import { LoadingSpinner } from "@/shared/components/feedback";
 
 export const AppRouter: React.FC = () => (
     <>
+        <AuthLoading>
+            <div className="flex items-center justify-center min-h-screen">
+                <LoadingSpinner />
+            </div>
+        </AuthLoading>
         <Routes>
             <Route
                 element={
