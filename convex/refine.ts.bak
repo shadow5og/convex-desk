@@ -36,7 +36,7 @@ export const getList = query({
         : ("desc" as const);
 
     // Query with order applied once — avoids TypeScript type narrowing issue
-    const orderedQuery = ctx.db.query(args.resource as any).order(sorterOrder);
+    const orderedQuery = ctx.db.query(args.resource).order(sorterOrder);
     const allData = await orderedQuery.collect();
 
     // Apply basic in-memory filters
